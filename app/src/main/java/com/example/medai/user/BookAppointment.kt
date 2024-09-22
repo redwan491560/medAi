@@ -1,11 +1,13 @@
 package com.example.medai.user
 
 import android.annotation.SuppressLint
+import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -17,7 +19,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -25,16 +26,11 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DrawerDefaults
 import androidx.compose.material3.DrawerValue
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
-import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -45,13 +41,12 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -60,21 +55,23 @@ import androidx.navigation.compose.rememberNavController
 import com.example.medai.R
 import com.example.medai.db.Screens
 import com.example.medai.db.volkorn
+import com.example.medai.ui.theme.ComposablesDesign.Companion.DropdownCard
 import com.example.medai.ui.theme.ComposablesDesign.Companion.IconsDesign
 import com.example.medai.ui.theme.ComposablesDesign.Companion.NavigationBarIcon
 import com.example.medai.ui.theme.ComposablesDesign.Companion.TextDesign
-import com.example.medai.ui.theme.doc
 import com.example.medai.ui.theme.drawerColor
 import com.example.medai.viewmodels.MainViewModel
 import kotlinx.coroutines.launch
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun BookAppointment(navController: NavHostController, mainViewModel: MainViewModel) {
 
-
+    var context = LocalContext.current
+    var search by remember {
+        mutableStateOf("")
+    }
     var chipState by remember {
         mutableIntStateOf(0)
     }
@@ -104,6 +101,11 @@ fun BookAppointment(navController: NavHostController, mainViewModel: MainViewMod
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 Spacer(modifier = Modifier.height(15.dp))
+                NavigationBarIcon(
+                    title = "Profile", icon = painterResource(id = R.drawable.profile)
+                ) {
+
+                }
                 NavigationBarIcon(
                     title = "Settings", icon = painterResource(id = R.drawable.settings)
                 ) {
@@ -168,12 +170,12 @@ fun BookAppointment(navController: NavHostController, mainViewModel: MainViewMod
             }
         }
     }) {
+        // screen starts from here
         Scaffold(
             modifier = Modifier
                 .fillMaxSize()
                 .background(Color.White)
                 .systemBarsPadding()
-                .padding(5.dp)
         ) {
             Column(
                 Modifier.fillMaxSize()
@@ -202,13 +204,15 @@ fun BookAppointment(navController: NavHostController, mainViewModel: MainViewMod
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
-                        IconsDesign(src = painterResource(id = R.drawable.cart)) {
-                            navController.navigate(Screens.CartScreen.name)
+                        IconsDesign(
+                            src = painterResource(id = R.drawable.search_doctors),
+                            size = 25
+                        ) {
+                            // search doctors by name
 
                         }
                         IconsDesign(src = painterResource(id = R.drawable.home)) {
                             navController.navigate(Screens.MainScreen.name)
-
                         }
                         IconsDesign(src = painterResource(id = R.drawable.menus)) {
                             scope.launch {
@@ -218,653 +222,189 @@ fun BookAppointment(navController: NavHostController, mainViewModel: MainViewMod
                     }
                 }
 
-                Spacer(modifier = Modifier.height(10.dp))
-                Box {
-                    Column(
-                        Modifier
+                Spacer(modifier = Modifier.height(5.dp))
+
+                // chips row
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(20.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(20.dp, 5.dp),
+                ) {
+                    chipsDocs.forEachIndexed { index, string ->
+                        Text(text = string,
+                            fontFamily = volkorn,
+                            fontSize = 20.sp,
+                            color = if (chipState == index) Color.Blue
+                            else Color.Black,
+                            textDecoration = if (chipState == index) TextDecoration.Underline
+                            else TextDecoration.None,
+                            modifier = Modifier.clickable {
+                                chipState = index
+                            })
+                    }
+
+                }
+
+                // location, hospital name, department, doctors name, date
+                // after selecting all the feeds it will show a serial number and when the doctor starts his chamber
+
+                Text(
+                    text = "Select All the fields to find Doctors",
+                    fontSize = 14.sp,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(10.dp, 5.dp),
+                    textAlign = TextAlign.End,
+                    fontFamily = volkorn,
+                    color = Color.Red
+                )
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(10.dp, 5.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+
+                    DropdownCard(
+                        itemsList = mainViewModel.locationList,
+                        info = mainViewModel.location
+                    )
+                    Spacer(modifier = Modifier.width(15.dp))
+
+                    DropdownCard(
+                        itemsList = mainViewModel.hospitalList,
+                        info = mainViewModel.hospital
+                    )
+                }
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(10.dp, 5.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+
+                    DropdownCard(
+                        itemsList = mainViewModel.departmentList,
+                        info = mainViewModel.department
+                    )
+                    Spacer(modifier = Modifier.width(15.dp))
+
+                    DropdownCard(
+                        itemsList = mainViewModel.timeList,
+                        info = mainViewModel.time
+                    )
+                }
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(10.dp, 5.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    DropdownCard(
+                        itemsList = mainViewModel.doctorsList,
+                        info = mainViewModel.doctor
+                    )
+                }
+
+                //  Result Showing Column
+                Spacer(modifier = Modifier.height(20.dp))
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    Card(
+                        modifier = Modifier
                             .fillMaxWidth()
-                            .verticalScroll(rememberScrollState()),
-                        verticalArrangement = Arrangement.spacedBy(10.dp)
+                            .padding(10.dp),
+                        shape = RoundedCornerShape(4.dp),
+                        elevation = CardDefaults.cardElevation(6.dp)
                     ) {
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(20.dp),
+                        Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(20.dp, 5.dp),
-                        ) {
-                            chipsDocs.forEachIndexed { index, string ->
-                                Text(text = string,
-                                    fontFamily = volkorn,
-                                    fontSize = 20.sp,
-                                    color = if (chipState == index) Color.Blue
-                                    else Color.Black,
-                                    textDecoration = if (chipState == index) TextDecoration.Underline
-                                    else TextDecoration.None,
-                                    modifier = Modifier.clickable {
-                                        chipState = index
-                                        if (index == 0)
-                                        {
-                                            presentState = true
-                                        } else{
-                                            presentState = false
-
-                                        }
-                                    })
-                            }
-
-                        }
-
-
-                        // location, hospital name, department, doctors name, date
-                        // after selecting all the feeds it will show a serial number and when the doctor starts his chamber
-
-                        if (presentState) {
-                            Column(
-                                verticalArrangement = Arrangement.spacedBy(15.dp)
-                            ) {
-                                // location
-
-                                var expLoc by remember { mutableStateOf(false) }
-
-                                ExposedDropdownMenuBox(
-                                    expanded = expLoc, onExpandedChange = {
-                                        expLoc = !expLoc
-                                    }, modifier = Modifier.fillMaxWidth()
-                                ) {
-                                    OutlinedTextField(modifier = Modifier
-                                        .fillMaxWidth()
-                                        .menuAnchor(),
-                                        value = mainViewModel.location.value,
-                                        onValueChange = {},
-                                        readOnly = true,
-                                        placeholder = {
-                                            TextDesign(name = "Select Location")
-                                        },
-                                        textStyle = TextStyle(
-                                            fontFamily = volkorn,
-                                            fontSize = 18.sp
-                                        ),
-                                        trailingIcon = {
-                                            ExposedDropdownMenuDefaults.TrailingIcon(
-                                                expanded = expLoc
-                                            )
-                                        })
-                                    ExposedDropdownMenu(
-                                        expanded = expLoc,
-                                        onDismissRequest = { expLoc = false },
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .wrapContentSize(Alignment.TopStart)
-                                    ) {
-                                        mainViewModel.locationList.forEachIndexed { index, string ->
-                                            DropdownMenuItem(text = {
-                                                Text(
-                                                    text = string,
-                                                    fontFamily = volkorn,
-                                                    fontSize = 18.sp,
-                                                )
-                                            }, onClick = {
-                                                mainViewModel.location.value =
-                                                    mainViewModel.locationList[index]
-                                                expLoc = false
-                                            }, modifier = Modifier.padding(5.dp)
-                                            )
-                                        }
-                                    }
-                                }
-
-                                // hospital
-
-                                var hosExp by remember { mutableStateOf(false) }
-
-
-                                ExposedDropdownMenuBox(
-                                    expanded = hosExp, onExpandedChange = {
-                                        hosExp = !hosExp
-                                    }, modifier = Modifier.fillMaxWidth()
-                                ) {
-                                    TextField(modifier = Modifier
-                                        .fillMaxWidth()
-                                        .menuAnchor(),
-                                        value = mainViewModel.hospital.value,
-                                        onValueChange = {},
-                                        readOnly = true,
-                                        placeholder = {
-                                            TextDesign(name = "Select Hospital")
-                                        },
-                                        textStyle = TextStyle(
-                                            fontFamily = volkorn,
-                                            fontSize = 18.sp
-                                        ),
-                                        trailingIcon = {
-                                            ExposedDropdownMenuDefaults.TrailingIcon(
-                                                expanded = hosExp
-                                            )
-                                        })
-                                    ExposedDropdownMenu(
-                                        expanded = hosExp,
-                                        onDismissRequest = { hosExp = false },
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .wrapContentSize(Alignment.TopStart)
-                                    ) {
-                                        mainViewModel.hospitalList.forEachIndexed { index, string ->
-                                            DropdownMenuItem(text = {
-                                                Text(
-                                                    text = string,
-                                                    fontFamily = volkorn,
-                                                    fontSize = 18.sp,
-                                                )
-                                            }, onClick = {
-                                                mainViewModel.hospital.value =
-                                                    mainViewModel.hospitalList[index]
-                                                hosExp = false
-                                            }, modifier = Modifier.padding(5.dp)
-                                            )
-                                        }
-                                    }
-                                }
-
-                                // department
-
-                                var deptExp by remember { mutableStateOf(false) }
-
-
-                                ExposedDropdownMenuBox(
-                                    expanded = deptExp, onExpandedChange = {
-                                        deptExp = !deptExp
-                                    }, modifier = Modifier.fillMaxWidth()
-                                ) {
-                                    TextField(modifier = Modifier
-                                        .fillMaxWidth()
-                                        .menuAnchor(),
-                                        value = mainViewModel.department.value,
-                                        onValueChange = {},
-                                        placeholder = {
-                                            TextDesign(name = "Select Department")
-                                        },
-                                        readOnly = true,
-                                        textStyle = TextStyle(
-                                            fontFamily = volkorn,
-                                            fontSize = 18.sp
-                                        ),
-                                        trailingIcon = {
-                                            ExposedDropdownMenuDefaults.TrailingIcon(
-                                                expanded = deptExp
-                                            )
-                                        })
-                                    ExposedDropdownMenu(
-                                        expanded = deptExp,
-                                        onDismissRequest = { deptExp = false },
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .wrapContentSize(Alignment.TopStart)
-                                    ) {
-                                        mainViewModel.departmentList.forEachIndexed { index, string ->
-                                            DropdownMenuItem(text = {
-                                                Text(
-                                                    text = string,
-                                                    fontFamily = volkorn,
-                                                    fontSize = 18.sp,
-                                                )
-                                            }, onClick = {
-                                                mainViewModel.department.value =
-                                                    mainViewModel.departmentList[index]
-                                                deptExp = false
-                                            }, modifier = Modifier.padding(5.dp)
-                                            )
-                                        }
-                                    }
-                                }
-
-
-                                // doctor
-
-                                var docExp by remember { mutableStateOf(false) }
-
-
-                                ExposedDropdownMenuBox(
-                                    expanded = docExp, onExpandedChange = {
-                                        docExp = !docExp
-                                    }, modifier = Modifier.fillMaxWidth()
-                                ) {
-                                    TextField(modifier = Modifier
-                                        .fillMaxWidth()
-                                        .menuAnchor(),
-                                        value = mainViewModel.doctor.value,
-                                        onValueChange = {},
-                                        placeholder = {
-                                            TextDesign(name = "Doctor's name")
-                                        },
-                                        readOnly = true,
-                                        textStyle = TextStyle(
-                                            fontFamily = volkorn,
-                                            fontSize = 18.sp
-                                        ),
-                                        trailingIcon = {
-                                            ExposedDropdownMenuDefaults.TrailingIcon(
-                                                expanded = docExp
-                                            )
-                                        })
-                                    ExposedDropdownMenu(
-                                        expanded = docExp,
-                                        onDismissRequest = { docExp = false },
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .wrapContentSize(Alignment.TopStart)
-                                    ) {
-                                        mainViewModel.doctorsList.forEachIndexed { index, string ->
-                                            DropdownMenuItem(text = {
-                                                Text(
-                                                    text = string,
-                                                    fontFamily = volkorn,
-                                                    fontSize = 18.sp,
-                                                )
-                                            }, onClick = {
-                                                mainViewModel.doctor.value =
-                                                    mainViewModel.doctorsList[index]
-                                                docExp = false
-                                            }, modifier = Modifier.padding(5.dp)
-                                            )
-                                        }
-                                    }
-                                }
-
-                                // time
-                                // fetch doctors active hour and show on the list
-
-
-                                var timeExp by remember { mutableStateOf(false) }
-
-                                ExposedDropdownMenuBox(
-                                    expanded = timeExp, onExpandedChange = {
-                                        timeExp = !timeExp
-                                    }, modifier = Modifier.fillMaxWidth()
-                                ) {
-                                    TextField(modifier = Modifier
-                                        .fillMaxWidth()
-                                        .menuAnchor(),
-                                        value = mainViewModel.time.value,
-                                        onValueChange = {},
-                                        readOnly = true,
-                                        placeholder = {
-                                            TextDesign(name = "Schedule time")
-                                        },
-                                        textStyle = TextStyle(
-                                            fontFamily = volkorn,
-                                            fontSize = 18.sp
-                                        ),
-                                        trailingIcon = {
-                                            ExposedDropdownMenuDefaults.TrailingIcon(
-                                                expanded = timeExp
-                                            )
-                                        })
-                                    ExposedDropdownMenu(
-                                        expanded = timeExp,
-                                        onDismissRequest = { timeExp = false },
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .wrapContentSize(Alignment.TopStart)
-                                    ) {
-                                        mainViewModel.timeList.forEachIndexed { index, string ->
-                                            DropdownMenuItem(text = {
-                                                Text(
-                                                    text = string,
-                                                    fontFamily = volkorn,
-                                                    fontSize = 18.sp,
-                                                )
-                                            }, onClick = {
-                                                mainViewModel.time.value =
-                                                    mainViewModel.timeList[index]
-                                                timeExp = false
-                                            }, modifier = Modifier.padding(5.dp)
-                                            )
-                                        }
-                                    }
-                                }
-
-
-                            }
-                        } else {
-                            Column(
-                                verticalArrangement = Arrangement.spacedBy(15.dp)
-                            ) {
-                                // location
-
-                                var expLoc by remember { mutableStateOf(false) }
-
-                                ExposedDropdownMenuBox(
-                                    expanded = expLoc, onExpandedChange = {
-                                        expLoc = !expLoc
-                                    }, modifier = Modifier.fillMaxWidth()
-                                ) {
-                                    OutlinedTextField(modifier = Modifier
-                                        .fillMaxWidth()
-                                        .menuAnchor(),
-                                        value = mainViewModel.location.value,
-                                        onValueChange = {},
-                                        readOnly = true,
-                                        placeholder = {
-                                            TextDesign(name = "Select Location")
-                                        },
-                                        textStyle = TextStyle(
-                                            fontFamily = volkorn,
-                                            fontSize = 18.sp
-                                        ),
-                                        trailingIcon = {
-                                            ExposedDropdownMenuDefaults.TrailingIcon(
-                                                expanded = expLoc
-                                            )
-                                        })
-                                    ExposedDropdownMenu(
-                                        expanded = expLoc,
-                                        onDismissRequest = { expLoc = false },
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .wrapContentSize(Alignment.TopStart)
-                                    ) {
-                                        mainViewModel.locationList.forEachIndexed { index, string ->
-                                            DropdownMenuItem(text = {
-                                                Text(
-                                                    text = string,
-                                                    fontFamily = volkorn,
-                                                    fontSize = 18.sp,
-                                                )
-                                            }, onClick = {
-                                                mainViewModel.location.value =
-                                                    mainViewModel.locationList[index]
-                                                expLoc = false
-                                            }, modifier = Modifier.padding(5.dp)
-                                            )
-                                        }
-                                    }
-                                }
-
-                                // hospital
-
-                                var hosExp by remember { mutableStateOf(false) }
-
-
-                                ExposedDropdownMenuBox(
-                                    expanded = hosExp, onExpandedChange = {
-                                        hosExp = !hosExp
-                                    }, modifier = Modifier.fillMaxWidth()
-                                ) {
-                                    TextField(modifier = Modifier
-                                        .fillMaxWidth()
-                                        .menuAnchor(),
-                                        value = mainViewModel.hospital.value,
-                                        onValueChange = {},
-                                        readOnly = true,
-                                        placeholder = {
-                                            TextDesign(name = "Select Hospital")
-                                        },
-                                        textStyle = TextStyle(
-                                            fontFamily = volkorn,
-                                            fontSize = 18.sp
-                                        ),
-                                        trailingIcon = {
-                                            ExposedDropdownMenuDefaults.TrailingIcon(
-                                                expanded = hosExp
-                                            )
-                                        })
-                                    ExposedDropdownMenu(
-                                        expanded = hosExp,
-                                        onDismissRequest = { hosExp = false },
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .wrapContentSize(Alignment.TopStart)
-                                    ) {
-                                        mainViewModel.hospitalList.forEachIndexed { index, string ->
-                                            DropdownMenuItem(text = {
-                                                Text(
-                                                    text = string,
-                                                    fontFamily = volkorn,
-                                                    fontSize = 18.sp,
-                                                )
-                                            }, onClick = {
-                                                mainViewModel.hospital.value =
-                                                    mainViewModel.hospitalList[index]
-                                                hosExp = false
-                                            }, modifier = Modifier.padding(5.dp)
-                                            )
-                                        }
-                                    }
-                                }
-
-                                // department
-
-                                var deptExp by remember { mutableStateOf(false) }
-
-
-                                ExposedDropdownMenuBox(
-                                    expanded = deptExp, onExpandedChange = {
-                                        deptExp = !deptExp
-                                    }, modifier = Modifier.fillMaxWidth()
-                                ) {
-                                    TextField(modifier = Modifier
-                                        .fillMaxWidth()
-                                        .menuAnchor(),
-                                        value = mainViewModel.department.value,
-                                        onValueChange = {},
-                                        placeholder = {
-                                            TextDesign(name = "Select Department")
-                                        },
-                                        readOnly = true,
-                                        textStyle = TextStyle(
-                                            fontFamily = volkorn,
-                                            fontSize = 18.sp
-                                        ),
-                                        trailingIcon = {
-                                            ExposedDropdownMenuDefaults.TrailingIcon(
-                                                expanded = deptExp
-                                            )
-                                        })
-                                    ExposedDropdownMenu(
-                                        expanded = deptExp,
-                                        onDismissRequest = { deptExp = false },
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .wrapContentSize(Alignment.TopStart)
-                                    ) {
-                                        mainViewModel.departmentList.forEachIndexed { index, string ->
-                                            DropdownMenuItem(text = {
-                                                Text(
-                                                    text = string,
-                                                    fontFamily = volkorn,
-                                                    fontSize = 18.sp,
-                                                )
-                                            }, onClick = {
-                                                mainViewModel.department.value =
-                                                    mainViewModel.departmentList[index]
-                                                deptExp = false
-                                            }, modifier = Modifier.padding(5.dp)
-                                            )
-                                        }
-                                    }
-                                }
-
-
-                                // doctor
-
-                                var docExp by remember { mutableStateOf(false) }
-
-
-                                ExposedDropdownMenuBox(
-                                    expanded = docExp, onExpandedChange = {
-                                        docExp = !docExp
-                                    }, modifier = Modifier.fillMaxWidth()
-                                ) {
-                                    TextField(modifier = Modifier
-                                        .fillMaxWidth()
-                                        .menuAnchor(),
-                                        value = mainViewModel.doctor.value,
-                                        onValueChange = {},
-                                        placeholder = {
-                                            TextDesign(name = "Doctor's name")
-                                        },
-                                        readOnly = true,
-                                        textStyle = TextStyle(
-                                            fontFamily = volkorn,
-                                            fontSize = 18.sp
-                                        ),
-                                        trailingIcon = {
-                                            ExposedDropdownMenuDefaults.TrailingIcon(
-                                                expanded = docExp
-                                            )
-                                        })
-                                    ExposedDropdownMenu(
-                                        expanded = docExp,
-                                        onDismissRequest = { docExp = false },
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .wrapContentSize(Alignment.TopStart)
-                                    ) {
-                                        mainViewModel.doctorsList.forEachIndexed { index, string ->
-                                            DropdownMenuItem(text = {
-                                                Text(
-                                                    text = string,
-                                                    fontFamily = volkorn,
-                                                    fontSize = 18.sp,
-                                                )
-                                            }, onClick = {
-                                                mainViewModel.doctor.value =
-                                                    mainViewModel.doctorsList[index]
-                                                docExp = false
-                                            }, modifier = Modifier.padding(5.dp)
-                                            )
-                                        }
-                                    }
-                                }
-
-
-                            }
-                        }
-
-                        Spacer(modifier = Modifier.height(10.dp))
-
-                        Card(
-                            modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(6.dp),
-                            colors = CardDefaults.cardColors(doc)
+                                .padding(5.dp),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.Start
                         ) {
                             Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(10.dp, 5.dp),
-                                horizontalArrangement = Arrangement.Center
+                                modifier = Modifier.fillMaxWidth()
                             ) {
                                 Column(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .weight(5f),
-                                    verticalArrangement = Arrangement.spacedBy(5.dp)
+                                    modifier = Modifier.weight(1f)
                                 ) {
-                                    TextDesign(name = "Hospital " + mainViewModel.hospital.value)
-                                    TextDesign(name = "Doctors name " + mainViewModel.doctor.value)
-                                    TextDesign(name = "Scheduled Time" + mainViewModel.time.value)
-
+                                    TextDesign(name = "(${mainViewModel.department.value})", font = 20)
+                                    Spacer(modifier = Modifier.height(5.dp))
+                                    TextDesign(name = mainViewModel.doctor.value, font = 24)
+                                    TextDesign(name = "- MBBS, BCS (Health)", font = 14)
+                                    TextDesign(name = "- FCPS", font = 14)
                                 }
                                 Column(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .weight(5f)
-                                ) {
-                                    TextDesign(name = "Location " + mainViewModel.location.value)
-                                    TextDesign(name = "Department " + mainViewModel.department.value)
-
-                                }
-                            }
-                        }
-
-                        Card(
-                            modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(6.dp),
-                            colors = CardDefaults.cardColors(doc)
-                        ) {
-                            Column(
-                                modifier = Modifier.fillMaxWidth(),
-                                verticalArrangement = Arrangement.spacedBy(5.dp)
-                            ) {
-                                Row(
-                                    Modifier.fillMaxWidth(),
-                                    verticalAlignment = Alignment.CenterVertically
+                                    modifier = Modifier.weight(1f)
                                 ) {
                                     Image(
                                         painter = painterResource(id = R.drawable.tanvir_mohit),
                                         contentDescription = null,
+                                        contentScale = ContentScale.Crop,
                                         modifier = Modifier
-                                            .padding(5.dp)
-                                            .size(100.dp)
-                                            .clip(RoundedCornerShape(6.dp)),
-                                        contentScale = ContentScale.Crop
+                                            .size(180.dp)
+                                            .align(Alignment.CenterHorizontally)
                                     )
-                                    Column(
-                                        horizontalAlignment = Alignment.Start,
-                                        verticalArrangement = Arrangement.spacedBy(4.dp),
-                                        modifier = Modifier.padding(10.dp, 10.dp)
-                                    ) {
-                                        Text(
-                                            text = "", fontFamily = volkorn, fontSize = 20.sp
-                                        )
-                                        Text(
-                                            text = "MBBS, BCS (Health), FCPS (Medicine)",
-                                            fontFamily = volkorn,
-                                            maxLines = 2,
-                                            overflow = TextOverflow.Ellipsis,
-                                            fontSize = 16.sp
-                                        )
-                                        Spacer(modifier = Modifier.height(3.dp))
-                                        Text(
-                                            text = "Assistant professor, Medicine",
-                                            fontFamily = volkorn,
-                                            fontSize = 14.sp, maxLines = 1,
-                                            overflow = TextOverflow.Ellipsis,
-                                        )
-                                        Text(
-                                            text = "Sylhet MAG Osmani Medical College and Hospital",
-                                            fontFamily = volkorn,
-                                            fontSize = 14.sp, maxLines = 2,
-                                            overflow = TextOverflow.Ellipsis,
-                                        )
-                                    }
-                                }
 
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(10.dp, 5.dp),
-                                    horizontalArrangement = Arrangement.Absolute.SpaceBetween
-                                ) {
-                                    Text(
-                                        text = "(Medicine)",
-                                        fontFamily = volkorn,
-                                        fontSize = 18.sp, maxLines = 2,
-                                        overflow = TextOverflow.Ellipsis,
-                                    )
-                                    Text(text = "Book Appointment",
-                                        fontFamily = volkorn,
-                                        color = Color.Blue,
-                                        fontSize = 14.sp,
-                                        maxLines = 2,
-                                        textDecoration = TextDecoration.Underline,
-                                        modifier = Modifier.clickable {
-                                            // make appointment
-                                        })
                                 }
-
                             }
-
+                            TextDesign(name = "Assistant Professor, (Medicine)")
+                            TextDesign(name = "Sylhet Osmani Medical College and Hospital")
                         }
+                    }
+                    // end of result
+                    OutlinedCard(
+                        border = BorderStroke(1.dp, color = Color.Black),
+                        modifier = Modifier
+                            .padding(15.dp)
+                            .align(Alignment.End),
+                        shape = RoundedCornerShape(6.dp),
+                        elevation = CardDefaults.cardElevation(0.dp),
 
-                        Spacer(modifier = Modifier.height(100.dp))
+                        ) {
+                        Text(
+                            text = "Book Appointment",
+                            fontSize = 14.sp,
+                            modifier = Modifier
+                                .padding(8.dp)
+                                .clickable {
+                                    scope.launch {
+                                        Toast
+                                            .makeText(
+                                                context,
+                                                "Appointment booking successful",
+                                                Toast.LENGTH_SHORT
+                                            )
+                                            .show()
+                                    }
 
+                                },
+                            fontFamily = volkorn,
+                            textDecoration = TextDecoration.Underline
+                        )
                     }
                 }
+
+
+
             }
+
         }
     }
 }
+
 
 @Preview(showSystemUi = true)
 @Composable

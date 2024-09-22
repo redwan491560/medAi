@@ -1,6 +1,7 @@
 package com.example.medai.user
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
@@ -50,9 +52,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.medai.R
 import com.example.medai.db.Screens
-import com.example.medai.db.articleList
-import com.example.medai.db.listOfDoctors
-import com.example.medai.db.listOfMeds
 import com.example.medai.db.volkorn
 import com.example.medai.ui.theme.ComposablesDesign.Companion.ArticleDesign
 import com.example.medai.ui.theme.ComposablesDesign.Companion.DoctorDesign
@@ -63,6 +62,7 @@ import com.example.medai.ui.theme.ComposablesDesign.Companion.TextDesign
 import com.example.medai.ui.theme.drawerColor
 import com.example.medai.ui.theme.textFieldColor
 import com.example.medai.ui.theme.textFieldColor2
+import com.example.medai.viewmodels.DatabaseViewModel
 import com.example.medai.viewmodels.MainViewModel
 import kotlinx.coroutines.launch
 
@@ -77,11 +77,12 @@ fun MainScreen(navController: NavHostController, mainViewModel: MainViewModel) {
         mutableStateOf("")
     }
     var chipsState by remember { mutableIntStateOf(0) }
-    val chipsMain = listOf("Articles", "Medicine", "Doctors")
+    val chipsMain = listOf("Articles", "News", "Medicine", "Doctors")
 
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
+    val databaseViewModel = DatabaseViewModel()
     val loadDataOnCreate = rememberCoroutineScope()
     // load all the necessary data upon the opening of the app
 
@@ -108,6 +109,11 @@ fun MainScreen(navController: NavHostController, mainViewModel: MainViewModel) {
 
                 }
                 NavigationBarIcon(
+                    title = "Profile", icon = painterResource(id = R.drawable.profile)
+                ) {
+
+                }
+                NavigationBarIcon(
                     title = "Medical history",
                     icon = painterResource(id = R.drawable.medical_history)
                 ) {
@@ -119,6 +125,7 @@ fun MainScreen(navController: NavHostController, mainViewModel: MainViewModel) {
                 ) {
 
                 }
+
                 NavigationBarIcon(
                     title = "Settings", icon = painterResource(id = R.drawable.settings)
                 ) {
@@ -286,22 +293,22 @@ fun MainScreen(navController: NavHostController, mainViewModel: MainViewModel) {
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
                     IconsDesign(
-                        src = painterResource(id = R.drawable.bookapp), size = 90
+                        src = painterResource(id = R.drawable.bookapp), size = 85
                     ) {
                         navController.navigate(Screens.BookAppointmentScreen.name)
                     }
                     IconsDesign(
-                        src = painterResource(id = R.drawable.booktest), size = 90
+                        src = painterResource(id = R.drawable.booktest), size = 85
                     ) {
                         navController.navigate(Screens.BookLabTestScreen.name)
                     }
                     IconsDesign(
-                        src = painterResource(id = R.drawable.searchprod), size = 90
+                        src = painterResource(id = R.drawable.searchprod), size = 85
                     ) {
                         navController.navigate(Screens.SearchProductsScreen.name)
                     }
                     IconsDesign(
-                        src = painterResource(id = R.drawable.record), size = 90
+                        src = painterResource(id = R.drawable.record), size = 85
                     ) {
                         navController.navigate(Screens.RecordActivitiesScreen.name)
                     }
@@ -313,7 +320,7 @@ fun MainScreen(navController: NavHostController, mainViewModel: MainViewModel) {
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(20.dp),
+                        horizontalArrangement = Arrangement.SpaceEvenly,
                     ) {
                         chipsMain.forEachIndexed { index, string ->
                             Text(text = string,
@@ -335,6 +342,22 @@ fun MainScreen(navController: NavHostController, mainViewModel: MainViewModel) {
                                         chipsState = index
                                     })
                         }
+                        Image(
+                            painter = painterResource(id = R.drawable.sort),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .size(20.dp)
+                                .padding(10.dp, 0.dp)
+                                .clickable {
+                                    if (chipsState == 0) {
+                                        // edit an schedule
+                                    } else {
+                                        // edit an appointment
+                                    }
+                                },
+                            alignment = Alignment.CenterEnd
+                        )
                     }
                     Column(
                         Modifier
@@ -343,22 +366,15 @@ fun MainScreen(navController: NavHostController, mainViewModel: MainViewModel) {
                         verticalArrangement = Arrangement.spacedBy(5.dp)
                     ) {
                         when (chipsState) {
-                            2 -> {
-                                listOfDoctors.forEach {
-                                    DoctorDesign(
-                                        name = it.name,
-                                        group = it.group,
-                                        visit = it.visit,
-                                        image = it.image
-                                    )
-                                }
+                            1 -> {
+
                             }
 
-                            1 -> {
+                            2 -> {
                                 Row(
                                     horizontalArrangement = Arrangement.spacedBy(10.dp)
                                 ) {
-                                    listOfMeds.forEach {
+                                    databaseViewModel.medicineList_user.forEach {
                                         MedicineDesign(
                                             name = it.name,
                                             usage = it.usage,
@@ -369,8 +385,19 @@ fun MainScreen(navController: NavHostController, mainViewModel: MainViewModel) {
                                 }
                             }
 
+                            3 -> {
+                                databaseViewModel.doctorList_user.forEach {
+                                    DoctorDesign(
+                                        name = it.name,
+                                        group = it.group,
+                                        visit = it.visit,
+                                        image = it.image
+                                    )
+                                }
+                            }
+
                             else -> {
-                                articleList.forEach {
+                                databaseViewModel.articleList.forEach {
                                     ArticleDesign(
                                         title = it.title,
                                         author = it.author,

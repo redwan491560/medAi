@@ -1,5 +1,7 @@
 package com.example.medai.db
 
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -9,7 +11,8 @@ import com.example.medai.R
 enum class Screens {
     MainScreen, OrderScreen, CartScreen,
     RecordActivitiesScreen, BookAppointmentScreen, SearchProductsScreen, BookLabTestScreen,
-    AdminHomePage, SignUp, LogIn
+    AdminHomePage, SignUp, LogIn,
+    DoctorHomePage, ManageAppointmentScreen, ManageScheduleScreen, UploadArticleScreen
 }
 
 
@@ -25,6 +28,22 @@ class Article(
     val view: Int,
     val rating: Double,
     val image: Int?
+)
+
+class News(
+    val title: String,
+    val description: String,
+    val author: String,
+    val view: Int,
+    val rating: Double,
+    val image: Int?
+)
+
+class Appointment(
+    val name: String,
+    val contact: Int,
+    val serial: Int,
+    val approved: MutableState<Boolean> = mutableStateOf(false)
 )
 
 

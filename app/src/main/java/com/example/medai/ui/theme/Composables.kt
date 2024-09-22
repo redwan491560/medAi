@@ -6,20 +6,34 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
+import androidx.compose.material.icons.outlined.ArrowDropDown
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -33,6 +47,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.medai.R
 import com.example.medai.db.volkorn
+import com.example.medai.ui.theme.ComposablesDesign.Companion.DropdownCard
+import com.example.medai.viewmodels.MainViewModel
 
 class ComposablesDesign {
     companion object {
@@ -45,6 +61,7 @@ class ComposablesDesign {
                 fontFamily = volkorn
             )
         }
+
 
         @Composable
         fun BarTextDesign(
@@ -298,9 +315,79 @@ class ComposablesDesign {
             }
 
         }
-    }
-}
 
+
+        @OptIn(ExperimentalMaterial3Api::class)
+        @Composable
+        fun RowScope.DropdownCard(
+            itemsList: List<String>,
+            info: MutableState<String>,
+        ) {
+            var expanded by remember { mutableStateOf(false) }
+
+            ExposedDropdownMenuBox(
+                expanded = expanded, onExpandedChange = {
+                    expanded = !expanded
+                }, modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+            ) {
+                Card(
+                    shape = RoundedCornerShape(8.dp),
+                    elevation = CardDefaults.cardElevation(8.dp),
+
+                    ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(15.dp, 10.dp)
+                            .menuAnchor(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = info.value,
+                            fontSize = 18.sp,
+                            fontFamily = volkorn,
+                            modifier = Modifier.weight(8f), maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                        Icon(imageVector = Icons.Outlined.ArrowDropDown, contentDescription = null,)
+
+                    }
+                }
+                ExposedDropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false },
+                    modifier = Modifier
+                        .padding(3.dp), scrollState = rememberScrollState()
+                ) {
+                    itemsList.forEachIndexed { index, string ->
+                        DropdownMenuItem(
+                            text = {
+                                Text(
+                                    text = string,
+                                    fontFamily = volkorn,
+                                    fontSize = 14.sp
+                                )
+                            },
+                            onClick = {
+                                info.value = itemsList[index] // Update selected item
+                                expanded = false // Close dropdown after selection
+                            },
+                            contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
+                        )
+
+                    }
+                }
+
+            }
+        }
+
+    }
+
+
+}
 
 @Preview(showSystemUi = true)
 @Composable
@@ -308,64 +395,29 @@ fun Adjdk() {
 
     Column(
         modifier = Modifier
-            .fillMaxWidth()
+            .fillMaxSize()
             .padding(10.dp)
     ) {
 
-        ComposablesDesign.NavigationBarIcon(
-            title = "Developer options", icon = painterResource(id = R.drawable.chat)
-        ) {
-
-        }
-        ComposablesDesign.NavigationBarIcon(
-            title = "Settings", icon = painterResource(id = R.drawable.chat)
-        ) {
-
-        }
-        ComposablesDesign.NavigationBarIcon(
-            title = "personalization", icon = painterResource(id = R.drawable.app_logo)
-        ) {
-
-        }
-        ComposablesDesign.NavigationBarIcon(
-            title = "report bug", icon = painterResource(id = R.drawable.cart)
-        ) {
-
-        }
-        ComposablesDesign.NavigationBarIcon(
-            title = "Contribute", icon = painterResource(id = R.drawable.server)
-        ) {
-
-        }
-
-//        ComposablesDesign.ArticleDesign(
-//            title = "Covid-19. how to keep your family safe",
-//            author = "Redwan Hussain",
-//            views = 2356,
-//            rating = "4.5+"
-//        ) {
-//
-//        }
-//        ComposablesDesign.MedicineDesign(
-//            name = "Seclo 20",
-//            usage = "Used for gastric related problem",
-//            price = 49,
-//            group = "Omeprazole"
+        val selectedDepartment =
+            remember { mutableStateOf("Location") } // Holds the selected department
+        val mainViewModel = MainViewModel()
+//        ComposablesDesign.DropdownMenus(
+//            departmentList = mainViewModel.departmentList,
+//            selectedDepartment = mainViewModel.department, // Binding to ViewModel's state
+//            label = "Select Department" // Optional, you can customize the label
 //        )
 
-//        ComposablesDesign.DoctorDesign(
-//            name = "Dr. Redwan Hussain", group = "Medicine", visit = "750", image = R.drawable.demo
-//        )
-//
-//        ComposablesDesign.ShowInfo(title = "Manufacturer", descriptor = "Square Company Ltd.")
-//
-//        Spacer(modifier = Modifier.height(20.dp))
-//        ComposablesDesign.ExerciseIcon(
-//            image = R.drawable.exe_one,
-//            title = "Go for a run",
-//        ) {
-//
-//        }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(15.dp, 10.dp), verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            DropdownCard(mainViewModel.locationList, selectedDepartment)
+            // DropdownCard(mainViewModel.locationList, selectedDepartment)
+        }
+
     }
 
 

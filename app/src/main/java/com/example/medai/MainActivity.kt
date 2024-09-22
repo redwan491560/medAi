@@ -21,6 +21,11 @@ import com.example.medai.user.CartScreen
 import com.example.medai.user.MainScreen
 import com.example.medai.user.RecordActivities
 import com.example.medai.user.SearchProducts
+import com.example.medai.user_doctor.DoctorHomepageScreen
+import com.example.medai.user_doctor.ManageAppointmentScreen
+import com.example.medai.user_doctor.ManageScheduleScreen
+import com.example.medai.user_doctor.UploadArticleScreen
+import com.example.medai.viewmodels.DatabaseViewModel
 import com.example.medai.viewmodels.MainViewModel
 
 
@@ -33,7 +38,7 @@ class MainActivity : ComponentActivity() {
                 darkTheme = false,
                 dynamicColor = false
             ) {
-                val mainViewModel by lazy { MainViewModel() }
+                val mainViewModel = MainViewModel()
                 val navController = rememberNavController()
                 App(mainViewModel, navController)
             }
@@ -72,6 +77,22 @@ fun App(mainViewModel: MainViewModel, navController: NavHostController) {
         }
         composable(route = Screens.CartScreen.name) {
             CartScreen(navController, mainViewModel)
+        }
+
+
+        // doctor
+        composable(route = Screens.DoctorHomePage.name) {
+            DoctorHomepageScreen(navController, mainViewModel)
+        }
+        composable(route = Screens.ManageScheduleScreen.name) {
+            ManageScheduleScreen()
+        }
+        // change to appropriate viewmodel
+        composable(route = Screens.ManageAppointmentScreen.name) {
+            ManageAppointmentScreen(viewModel = DatabaseViewModel())
+        }
+        composable(route = Screens.UploadArticleScreen.name) {
+            UploadArticleScreen()
         }
     }
 }

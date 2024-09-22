@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     id("io.realm.kotlin")
+
 }
 
 android {
@@ -78,5 +79,8 @@ dependencies {
     implementation("io.realm.kotlin:library-sync:1.16.0")
     // If using coroutines with the SDK
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.0")
+    // serialization
+   // implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.1")
+
 
 }
