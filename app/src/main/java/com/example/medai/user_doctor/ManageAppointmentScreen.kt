@@ -143,6 +143,6 @@ fun ManageAppointmentScreen(viewModel: DatabaseViewModel) {
 
 @Preview(showSystemUi = true)
 @Composable
-private fun sASJjnd() {
+private fun ASJjnd() {
     ManageAppointmentScreen(DatabaseViewModel())
 }
