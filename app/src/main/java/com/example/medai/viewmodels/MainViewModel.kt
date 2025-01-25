@@ -6,11 +6,6 @@ import androidx.lifecycle.ViewModel
 
 class MainViewModel : ViewModel() {
 
-    var artState = mutableIntStateOf(0)
-    var medState = mutableIntStateOf(0)
-    var docState = mutableIntStateOf(0)
-
-
     val location = mutableStateOf("Location")
     val hospital = mutableStateOf("Hospital")
     val department = mutableStateOf("Department")
@@ -65,6 +60,11 @@ class MainViewModel : ViewModel() {
         "Dermatology",
         "Heart disease"
     )
+
+
+    // user selection
+    val userType = listOf("User", "Doctor", "Pharmacist", "Sales")
+    var info = mutableStateOf("Sales")
 
 
 }

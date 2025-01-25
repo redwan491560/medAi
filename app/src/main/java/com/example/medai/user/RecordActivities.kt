@@ -2,6 +2,7 @@ package com.example.medai.user
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
@@ -34,14 +36,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import coil3.compose.AsyncImage
 import com.example.medai.R
-import com.example.medai.db.Screens
 import com.example.medai.db.volkorn
 import com.example.medai.ui.theme.ComposablesDesign.Companion.BarTextDesign
 import com.example.medai.ui.theme.ComposablesDesign.Companion.ExerciseIcon
 import com.example.medai.ui.theme.ComposablesDesign.Companion.IconsDesign
 import com.example.medai.ui.theme.ComposablesDesign.Companion.TextDesign
 import com.example.medai.ui.theme.drawerColor
+import com.example.medai.util.Routes
 import com.example.medai.viewmodels.MainViewModel
 import kotlinx.coroutines.launch
 
@@ -141,18 +144,24 @@ fun RecordActivities(navController: NavHostController, mainViewModel: MainViewMo
                     ) {
                         IconsDesign(src = painterResource(id = R.drawable.cart)) {
                             scope.launch {
-                                navController.navigate(Screens.CartScreen.name)
+                                navController.navigate(Routes.Cart)
                             }
                         }
                         IconsDesign(src = painterResource(id = R.drawable.home)) {
-                            navController.navigate(Screens.MainScreen.name)
+                            navController.navigate(Routes.Main)
 
                         }
-                        IconsDesign(src = painterResource(id = R.drawable.menus)) {
-                            scope.launch {
-                                drawerState.open()
-                            }
-                        }
+                        AsyncImage(
+                            model = "https://cdn-icons-png.flaticon.com/128/17688/17688367.png",
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(35.dp)
+                                .clickable {
+                                    scope.launch {
+                                        drawerState.open()
+                                    }
+                                }
+                        )
                     }
                 }
                 Spacer(modifier = Modifier.height(10.dp))

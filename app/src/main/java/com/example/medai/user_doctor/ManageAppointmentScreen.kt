@@ -80,12 +80,9 @@ fun ManageAppointmentScreen(viewModel: DatabaseViewModel) {
                     fontFamily = volkorn,
                     textDecoration = TextDecoration.Underline, color = Color.Blue
                 )
-
             }
 
             // appointment list
-
-
             viewModel.appointmentList.forEach {
                 Card(
                     modifier = Modifier
@@ -129,20 +126,14 @@ fun ManageAppointmentScreen(viewModel: DatabaseViewModel) {
                         )
                     }
                 }
-
             }
-
         }
-
-
     }
-
-
 }
 
 
 @Preview(showSystemUi = true)
 @Composable
-private fun ASJjnd() {
+private fun Sdijsdsd() {
     ManageAppointmentScreen(DatabaseViewModel())
 }

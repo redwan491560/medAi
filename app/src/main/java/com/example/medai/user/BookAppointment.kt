@@ -6,7 +6,6 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -52,14 +51,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import coil3.compose.AsyncImage
 import com.example.medai.R
-import com.example.medai.db.Screens
 import com.example.medai.db.volkorn
 import com.example.medai.ui.theme.ComposablesDesign.Companion.DropdownCard
 import com.example.medai.ui.theme.ComposablesDesign.Companion.IconsDesign
 import com.example.medai.ui.theme.ComposablesDesign.Companion.NavigationBarIcon
 import com.example.medai.ui.theme.ComposablesDesign.Companion.TextDesign
 import com.example.medai.ui.theme.drawerColor
+import com.example.medai.util.Routes
 import com.example.medai.viewmodels.MainViewModel
 import kotlinx.coroutines.launch
 
@@ -68,7 +68,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun BookAppointment(navController: NavHostController, mainViewModel: MainViewModel) {
 
-    var context = LocalContext.current
+    val context = LocalContext.current
     var search by remember {
         mutableStateOf("")
     }
@@ -77,9 +77,6 @@ fun BookAppointment(navController: NavHostController, mainViewModel: MainViewMod
     }
     val chipsDocs = listOf("Online", "Onsite")
 
-    var presentState by remember {
-        mutableStateOf(true)
-    }
 
     val scope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
@@ -212,13 +209,19 @@ fun BookAppointment(navController: NavHostController, mainViewModel: MainViewMod
 
                         }
                         IconsDesign(src = painterResource(id = R.drawable.home)) {
-                            navController.navigate(Screens.MainScreen.name)
+                            navController.navigate(Routes.Main)
                         }
-                        IconsDesign(src = painterResource(id = R.drawable.menus)) {
-                            scope.launch {
-                                drawerState.open()
-                            }
-                        }
+                        AsyncImage(
+                            model = "https://cdn-icons-png.flaticon.com/128/17688/17688367.png",
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(35.dp)
+                                .clickable {
+                                    scope.launch {
+                                        drawerState.open()
+                                    }
+                                }
+                        )
                     }
                 }
 
@@ -267,7 +270,6 @@ fun BookAppointment(navController: NavHostController, mainViewModel: MainViewMod
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center
                 ) {
-
                     DropdownCard(
                         itemsList = mainViewModel.locationList,
                         info = mainViewModel.location
@@ -287,7 +289,6 @@ fun BookAppointment(navController: NavHostController, mainViewModel: MainViewMod
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center
                 ) {
-
                     DropdownCard(
                         itemsList = mainViewModel.departmentList,
                         info = mainViewModel.department
@@ -340,7 +341,10 @@ fun BookAppointment(navController: NavHostController, mainViewModel: MainViewMod
                                 Column(
                                     modifier = Modifier.weight(1f)
                                 ) {
-                                    TextDesign(name = "(${mainViewModel.department.value})", font = 20)
+                                    TextDesign(
+                                        name = "(${mainViewModel.department.value})",
+                                        font = 20
+                                    )
                                     Spacer(modifier = Modifier.height(5.dp))
                                     TextDesign(name = mainViewModel.doctor.value, font = 24)
                                     TextDesign(name = "- MBBS, BCS (Health)", font = 14)
@@ -357,7 +361,6 @@ fun BookAppointment(navController: NavHostController, mainViewModel: MainViewMod
                                             .size(180.dp)
                                             .align(Alignment.CenterHorizontally)
                                     )
-
                                 }
                             }
                             TextDesign(name = "Assistant Professor, (Medicine)")
@@ -371,9 +374,8 @@ fun BookAppointment(navController: NavHostController, mainViewModel: MainViewMod
                             .padding(15.dp)
                             .align(Alignment.End),
                         shape = RoundedCornerShape(6.dp),
-                        elevation = CardDefaults.cardElevation(0.dp),
-
-                        ) {
+                        elevation = CardDefaults.cardElevation(0.dp)
+                    ) {
                         Text(
                             text = "Book Appointment",
                             fontSize = 14.sp,
@@ -389,18 +391,13 @@ fun BookAppointment(navController: NavHostController, mainViewModel: MainViewMod
                                             )
                                             .show()
                                     }
-
                                 },
                             fontFamily = volkorn,
                             textDecoration = TextDecoration.Underline
                         )
                     }
                 }
-
-
-
             }
-
         }
     }
 }

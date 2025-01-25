@@ -6,38 +6,37 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import com.example.medai.R
+import kotlinx.serialization.Serializable
 
 
-enum class Screens {
-    MainScreen, OrderScreen, CartScreen,
-    RecordActivitiesScreen, BookAppointmentScreen, SearchProductsScreen, BookLabTestScreen,
-    AdminHomePage, SignUp, LogIn,
-    DoctorHomePage, ManageAppointmentScreen, ManageScheduleScreen, UploadArticleScreen
+
+sealed class Status {
+    data object Authenticated : Status()
+    data object NotAuthenticated : Status()
+    data object Loading : Status()
+    data class Error(val message: String) : Status()
 }
-
 
 val volkorn = FontFamily(
     Font(R.font.volkorn, weight = FontWeight.Normal)
 )
 
-// article dummy
-class Article(
-    val title: String,
-    val description: String,
-    val author: String,
-    val view: Int,
-    val rating: Double,
-    val image: Int?
+data class NewsItem(
+    val title: String = "",
+    val author: String = "",
+    val timestamp: String = "",
+    val description: String = ""
 )
 
-class News(
-    val title: String,
-    val description: String,
-    val author: String,
-    val view: Int,
-    val rating: Double,
-    val image: Int?
-)
+
+//class News(
+//    val title: String,
+//    val description: String,
+//    val author: String,
+//    val view: Int,
+//    val rating: Double,
+//    val image: Int?
+//)
 
 class Appointment(
     val name: String,
@@ -46,25 +45,15 @@ class Appointment(
     val approved: MutableState<Boolean> = mutableStateOf(false)
 )
 
-
-val articleList = listOf(
-    Article(
-        "Covid-19. How to keep your family safe!",
-        "To keep your fa To keep your family safe from Covid-19, follow key precautions: encourage frequent hand washing with soap and water for at least 20 seconds, or use hand sanitizer with at least 60% alcohol. Wear masks in crowded or enclosed spaces, especially if someone is sick or at higher risk. Practice physical distancing, aiming for at least 6 feet apart from others. Clean and disinfect frequently touched surfaces daily. Stay updated on local mily safe from Covid-19, follow key precautions: encourage frequent hand washing with soap and water for at least 20 seconds, or use hand sanitizer with at least 60% alcohol. Wear masks in crowded or enclosed spaces, especially if someone is sick or at higher risk. Practice physical distancing, aiming for at least 6 feet apart from others. Clean and disinfect frequently touched surfaces daily. Stay updated on local",
-        "Redwan Hussain",
-        1234,
-        3.5,
-        R.drawable.demo
-    ), Article(
-        "Why mental health is important for us!",
-        "To keep your fa To keep your family safe from Covid-19, follow key precautions: encourage frequent hand washing with soap and water for at least 20 seconds, or use hand sanitizer with at least 60% alcohol. Wear masks in crowded or enclosed spaces, especially if someone is sick or at higher risk. Practice physical distancing, aiming for at least 6 feet apart from others. Clean and disinfect frequently touched surfaces daily. Stay updated on local mily safe from Covid-19, follow key precautions: encourage frequent hand washing with soap and water for at least 20 seconds, or use hand sanitizer with at least 60% alcohol. Wear masks in crowded or enclosed spaces, especially if someone is sick or at higher risk. Practice physical distancing, aiming for at least 6 feet apart from others. Clean and disinfect frequently touched surfaces daily. Stay updated on local",
-        "Redwan Hussain",
-        1234,
-        3.5,
-        null
-    )
+class Article(
+    val title: String,
+    val description: String,
+    val author: String,
+    val view: Int,
+    val rating: Double,
+    val image: Int?,
+    val category: String? = null
 )
-
 
 class Medicine(
     val name: String,
@@ -90,16 +79,14 @@ val listOfMeds = listOf(
         usage = "gastric related problems",
         dosage = "1-1-1",
         dosageTime = "30 min before eating"
-    ),
-    Medicine(
+    ), Medicine(
         name = "Seclo 40",
         group = "Omeprazole",
         price = 60,
         usage = "gastric related problems",
         dosage = "1-1-1",
         dosageTime = "30 min before eating"
-    ),
-    Medicine(
+    ), Medicine(
         name = "maxpro 20",
         group = "Omeprazole",
         price = 98,
@@ -118,8 +105,8 @@ val listOfDoctors = listOf(
     Doctors(
         "Dr. Redwan Hussain", "Medicine", "500", image = R.drawable.demo
     ),
-    Doctors("Dr. najmul islam foga", "Sex and Disease", "150", R.drawable.demo),
+    Doctors("Dr. Kader", "Sex and Disease", "150", R.drawable.demo),
     Doctors("Dr. Miner Rimon", "Gayene", "180", R.drawable.demo),
-    Doctors("Dr. Ashfak Uzza", "Orthopedicks", "90", R.drawable.demo),
+    Doctors("Dr. Noakhali", "Orthopedicks", "90", R.drawable.demo),
 )
 

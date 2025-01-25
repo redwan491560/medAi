@@ -1,6 +1,7 @@
 package com.example.medai.user
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -12,9 +13,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DrawerDefaults
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ModalDrawerSheet
@@ -39,20 +43,25 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.medai.R
-import com.example.medai.db.Screens
 import com.example.medai.db.volkorn
-import com.example.medai.ui.theme.ComposablesDesign.Companion.BarTextDesign
 import com.example.medai.ui.theme.ComposablesDesign.Companion.IconsDesign
+import com.example.medai.ui.theme.ComposablesDesign.Companion.NavigationBarIcon
+import com.example.medai.ui.theme.ComposablesDesign.Companion.TextDesign
 import com.example.medai.ui.theme.drawerColor
-import com.example.medai.viewmodels.ClickableStateViewModel
+import com.example.medai.util.Routes
+import com.example.medai.viewmodels.AuthViewModel
 import com.example.medai.viewmodels.MainViewModel
 import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun BookLabTest(navController: NavHostController, mainViewModel: MainViewModel) {
+fun BookLabTest(
+    navController: NavHostController,
+    mainViewModel: MainViewModel,
+    authViewmodel: AuthViewModel
+) {
 
-    val state = ClickableStateViewModel()
+
     var chipsState by remember { mutableIntStateOf(0) }
     val chips = listOf("Remote test", "Onsite test")
 
@@ -73,11 +82,113 @@ fun BookLabTest(navController: NavHostController, mainViewModel: MainViewModel) 
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Spacer(modifier = Modifier.height(15.dp))
-                BarTextDesign(name = "Settings") {}
-                BarTextDesign(name = "Personalize") {}
-                BarTextDesign(name = "Security") {}
-                BarTextDesign(name = "Developer options") {}
-                BarTextDesign(name = "Routine checks") {}
+                NavigationBarIcon(
+                    title = "Questions and Answers", icon = painterResource(id = R.drawable.qna)
+                ) {
+
+                }
+                NavigationBarIcon(
+                    title = "Profile", icon = painterResource(id = R.drawable.profile)
+                ) {
+
+                }
+                NavigationBarIcon(
+                    title = "Medical history",
+                    icon = painterResource(id = R.drawable.medical_history)
+                ) {
+
+                }
+                NavigationBarIcon(
+                    title = "Check ICU",
+                    icon = painterResource(id = R.drawable.medical_history)
+                ) {
+
+                }
+
+                NavigationBarIcon(
+                    title = "Settings", icon = painterResource(id = R.drawable.settings)
+                ) {
+
+                }
+                NavigationBarIcon(
+                    title = "Find Blood", icon = painterResource(id = R.drawable.find_blood)
+                ) {
+
+                }
+                NavigationBarIcon(
+                    title = "Donate Blood", icon = painterResource(id = R.drawable.donate_blood)
+                ) {
+
+                }
+                NavigationBarIcon(
+                    title = "Routine check up",
+                    icon = painterResource(id = R.drawable.routine_checkup)
+                ) {
+
+                }
+
+                NavigationBarIcon(
+                    title = "Security", icon = painterResource(id = R.drawable.security)
+                ) {
+
+                }
+                NavigationBarIcon(
+                    title = "Developer options", icon = painterResource(id = R.drawable.dev_ops)
+                ) {
+
+                }
+                NavigationBarIcon(
+                    title = "Report bug", icon = painterResource(id = R.drawable.report_bug)
+                ) {
+
+                }
+
+                Row {
+                    Card(
+                        shape = RoundedCornerShape(4.dp),
+                        elevation = CardDefaults.cardElevation(4.dp),
+                        modifier = Modifier.clickable {
+                            authViewmodel.signOut()
+                        }
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Start,
+                            verticalAlignment = Alignment.CenterVertically
+
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.logout_24px),
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .padding(10.dp, 10.dp)
+                                    .size(20.dp)
+                            )
+                            Text(
+                                text = "Sign Out", fontSize = 14.sp,
+                                modifier = Modifier.padding(10.dp, 5.dp), fontFamily = volkorn
+                            )
+                        }
+                    }
+                }
+
+                Row(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.Bottom
+                ) {
+                    Row(
+                        Modifier.padding(10.dp, 20.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        IconsDesign(
+                            src = painterResource(id = R.drawable.app_logo), size = 50
+                        ) {
+
+                        }
+                        TextDesign(name = "MedAi", font = 20)
+                    }
+                }
             }
         }
     }) {
@@ -115,18 +226,20 @@ fun BookLabTest(navController: NavHostController, mainViewModel: MainViewModel) 
                         horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
                         IconsDesign(src = painterResource(id = R.drawable.cart)) {
-                            navController.navigate(Screens.CartScreen.name)
+                            navController.navigate(Routes.Cart)
 
                         }
                         IconsDesign(src = painterResource(id = R.drawable.home)) {
-                            navController.navigate(Screens.MainScreen.name)
+                            navController.navigate(Routes.Main)
 
                         }
-                        IconsDesign(src = painterResource(id = R.drawable.menus)) {
+                        IconsDesign(src = painterResource(id = R.drawable.menu)) {
                             scope.launch {
                                 drawerState.open()
                             }
+
                         }
+
                     }
                 }
                 Column(
@@ -160,10 +273,4 @@ fun BookLabTest(navController: NavHostController, mainViewModel: MainViewModel) 
         }
     }
 
-}
-
-@Preview
-@Composable
-fun Afsf() {
-    BookLabTest(rememberNavController(), MainViewModel())
 }

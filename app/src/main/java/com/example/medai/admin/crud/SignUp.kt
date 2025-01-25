@@ -1,360 +1,479 @@
 package com.example.medai.admin.crud
 
+import android.annotation.SuppressLint
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
-import com.example.medai.viewmodels.MainViewModel
 import com.example.medai.R
-import com.example.medai.db.Screens
-import com.example.medai.ui.theme.signup
-import com.example.medai.ui.theme.textFieldColor
-import com.example.medai.ui.theme.textFieldColor2
+import com.example.medai.db.Status
 import com.example.medai.db.volkorn
+import com.example.medai.ui.theme.signup
+import com.example.medai.ui.theme.signupCard
+import com.example.medai.ui.theme.textFieldColor2
+import com.example.medai.util.Routes
+import com.example.medai.viewmodels.AuthViewModel
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun SignUp(navController: NavHostController, mainViewModel: MainViewModel) {
+fun SignUp(navController: NavHostController, authViewmodel: AuthViewModel) {
 
-    var handle by remember {
+
+    var userName by remember {
+        mutableStateOf("")
+    }
+    var phone by remember {
         mutableStateOf("")
     }
     var password by remember {
-        mutableStateOf("")
-    }
-    var retypePass by remember {
         mutableStateOf("")
     }
     var email by remember {
         mutableStateOf("")
     }
 
-    var phone by remember {
+    var retypePassword by remember {
         mutableStateOf("")
     }
+
+    val context = LocalContext.current
+    val authState = authViewmodel.authState.observeAsState()
+
+
+    LaunchedEffect(authState.value) {
+        when (authState.value) {
+            is Status.Error -> Toast.makeText(
+                context,
+                (authState.value as Status.Error).message,
+                Toast.LENGTH_SHORT
+            ).show()
+
+            else -> Unit
+        }
+    }
+
     var checkedState by remember {
         mutableStateOf(false)
     }
 
-
-    Box(
-        modifier = Modifier.fillMaxSize()
+    Scaffold(
+        modifier = Modifier
+            .fillMaxSize()
+            .systemBarsPadding()
     ) {
-
-        Image(
-            painter = painterResource(id = R.drawable.signup),
-            contentDescription = null,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(0.dp, 0.dp, 0.dp, 0.dp),
-            contentScale = ContentScale.Crop,
-
-            )
-        Spacer(
-            modifier = Modifier
-                .fillMaxSize()
-                .align(Alignment.Center)
-                .alpha(0.6f)
-                .background(signup)
-        )
-
-        Column(
-            Modifier
-                .fillMaxWidth()
-                .padding(50.dp, 80.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
+        Box(
+            modifier = Modifier.fillMaxSize()
         ) {
+            Image(
+                painter = painterResource(id = R.drawable.signup),
+                contentDescription = null,
+                modifier = Modifier
+                    .fillMaxSize(),
+                contentScale = ContentScale.Crop
+            )
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(10.dp)
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.app_logo),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(80.dp),
-                    colorFilter = ColorFilter.tint(Color.Red)
 
-                )
-                Text(text = "MedAi", fontSize = 24.sp, fontFamily = volkorn, color = Color.White)
-            }
-            Spacer(modifier = Modifier.height(30.dp))
+            Spacer(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .align(Alignment.Center)
+                    .alpha(0.7f)
+                    .padding(10.dp, 10.dp)
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(signup)
+            )
+
             Column(
                 Modifier
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .fillMaxHeight()
+                    .padding(40.dp, 20.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(5.dp)
             ) {
-                TextField(
-                    value = handle,
-                    onValueChange = {
-                        handle = it
-                    },
-                    textStyle = TextStyle(
-                        color = Color.Black, fontFamily = volkorn, fontSize = 14.sp
-                    ),
-                    singleLine = true,
-                    placeholder = {
-                        Text(
-                            color = Color.Black,
-                            text = "Handle name",
-                            fontFamily = volkorn,
-                            fontSize = 14.sp,
-                        )
-
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(60.dp)
-                        .padding(0.dp, 5.dp),
-                    shape = RoundedCornerShape(6.dp),
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Text,
-                        imeAction = ImeAction.Next
-                    ),
-                    colors = TextFieldDefaults.colors(
-                        focusedTextColor = Color.Black,
-                        unfocusedTextColor = Color.Black,
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent,
-                        focusedContainerColor = Color(textFieldColor2.value),
-                        unfocusedContainerColor = Color(textFieldColor.value)
-                    )
-                )
-                TextField(
-                    value = email,
-                    onValueChange = {
-                        email = it
-                    },
-                    textStyle = TextStyle(
-                        color = Color.Black, fontFamily = volkorn, fontSize = 14.sp
-                    ),
-                    singleLine = true,
-                    placeholder = {
-                        Text(
-                            color = Color.Black,
-                            text = "Email",
-                            fontFamily = volkorn,
-                            fontSize = 14.sp,
-                        )
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(60.dp)
-                        .padding(0.dp, 5.dp),
-                    shape = RoundedCornerShape(6.dp),
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Email,
-                        imeAction = ImeAction.Next
-                    ),
-                    colors = TextFieldDefaults.colors(
-                        focusedTextColor = Color.Black,
-                        unfocusedTextColor = Color.Black,
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent,
-                        focusedContainerColor = Color(textFieldColor2.value),
-                        unfocusedContainerColor = Color(textFieldColor.value)
-                    )
-                )
-                TextField(
-                    value = phone,
-                    onValueChange = {
-                        phone = it
-                    },
-                    textStyle = TextStyle(
-                        color = Color.Black, fontFamily = volkorn, fontSize = 14.sp
-                    ),
-                    singleLine = true,
-                    placeholder = {
-                        Text(
-                            color = Color.Black,
-                            text = "Contact",
-                            fontFamily = volkorn,
-                            fontSize = 14.sp,
-                        )
-
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(60.dp)
-                        .padding(0.dp, 5.dp),
-                    shape = RoundedCornerShape(6.dp),
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Number,
-                        imeAction = ImeAction.Next
-                    ),
-                    keyboardActions = KeyboardActions(
-                        onDone = {
-                            // validate phone
-                        }
-                    ),
-                    colors = TextFieldDefaults.colors(
-                        focusedTextColor = Color.Black,
-                        unfocusedTextColor = Color.Black,
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent,
-                        focusedContainerColor = Color(textFieldColor2.value),
-                        unfocusedContainerColor = Color(textFieldColor.value)
-                    )
-                )
-                TextField(
-                    value = password,
-                    onValueChange = {
-                        password = it
-                    },
-                    textStyle = TextStyle(
-                        color = Color.Black, fontFamily = volkorn, fontSize = 14.sp
-                    ),
-                    singleLine = true,
-                    placeholder = {
-                        Text(
-                            color = Color.Black,
-                            text = "Password",
-                            fontFamily = volkorn,
-                            fontSize = 14.sp,
-                        )
-
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(60.dp)
-                        .padding(0.dp, 5.dp),
-                    shape = RoundedCornerShape(6.dp),
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Password,
-                        imeAction = ImeAction.Next
-                    ),
-                    keyboardActions = KeyboardActions(
-                        onDone = {
-
-                        }
-                    ),
-                    colors = TextFieldDefaults.colors(
-                        focusedTextColor = Color.Black,
-                        unfocusedTextColor = Color.Black,
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent,
-                        focusedContainerColor = Color(textFieldColor2.value),
-                        unfocusedContainerColor = Color(textFieldColor.value)
-                    )
-                )
-                TextField(
-                    value = retypePass,
-                    onValueChange = {
-                        retypePass = it
-                    },
-                    textStyle = TextStyle(
-                        color = Color.Black, fontFamily = volkorn, fontSize = 14.sp
-                    ),
-                    singleLine = true,
-                    placeholder = {
-                        Text(
-                            color = Color.Black,
-                            text = "Retype password",
-                            fontFamily = volkorn,
-                            fontSize = 14.sp,
-                        )
-
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(60.dp)
-                        .padding(0.dp, 5.dp),
-                    shape = RoundedCornerShape(6.dp),
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Password,
-                        imeAction = ImeAction.Done
-                    ),
-                    keyboardActions = KeyboardActions(
-                        onDone = {
-                            // validate the user
-                        }
-                    ),
-                    colors = TextFieldDefaults.colors(
-                        focusedTextColor = Color.Black,
-                        unfocusedTextColor = Color.Black,
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent,
-                        focusedContainerColor = Color(textFieldColor2.value),
-                        unfocusedContainerColor = Color(textFieldColor.value)
-                    )
-                )
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 30.dp),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Start
+                    horizontalArrangement = Arrangement.Center
                 ) {
-                    Checkbox(checked = checkedState, onCheckedChange = {
-                        checkedState = !checkedState
-                    })
-                    Text(
-                        text = "Agree to the terms and condition",
-                        fontFamily = volkorn,
-                        fontSize = 12.sp
+                    Image(
+                        painter = painterResource(id = R.drawable.app_logo),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .padding(15.dp)
+                            .size(60.dp),
+                        colorFilter = ColorFilter.tint(Color.White)
+
                     )
-                }
-                OutlinedButton(
-                    onClick = {
-                        navController.navigate(Screens.MainScreen.name)
-                    },
-                    colors = ButtonDefaults.buttonColors(signup),
-                    shape = RoundedCornerShape(8.dp)
-                ) {
                     Text(
-                        text = "Sign Up", color = Color.Black,
-                        fontSize = 20.sp,
+                        text = "MedAi",
+                        fontSize = 24.sp,
                         fontFamily = volkorn,
+                        color = Color.White
                     )
 
+                }
+                Column(
+                    modifier = Modifier
+                        .padding(vertical = 20.dp)
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    TextField(
+                        value = userName,
+                        onValueChange = {
+                            userName = it
+                        },
+                        textStyle = TextStyle(
+                            fontFamily = volkorn,
+                            fontSize = 14.sp
+                        ),
+                        singleLine = true,
+                        placeholder = {
+                            Text(
+                                text = "Username",
+                                fontFamily = volkorn,
+                                fontSize = 14.sp,
+                            )
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(60.dp)
+                            .padding(0.dp, 5.dp)
+                            .clip(RoundedCornerShape(10.dp)),
+                        shape = RoundedCornerShape(6.dp),
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Text,
+                            imeAction = ImeAction.Next
+                        ),
+                        colors = TextFieldDefaults.colors(
+                            focusedTextColor = Color.White,
+                            unfocusedTextColor = Color.Black,
+                            focusedPlaceholderColor = Color.White,
+                            unfocusedPlaceholderColor = Color.Black,
+                            focusedIndicatorColor = Color.Blue,
+                            unfocusedIndicatorColor = Color.Black,
+                            focusedContainerColor = Color(signup.value),
+                            unfocusedContainerColor = Color(signupCard.value)
+                        )
+                    )
+                    TextField(
+                        value = phone,
+                        onValueChange = {
+                            phone = it
+                        },
+                        textStyle = TextStyle(
+                            fontFamily = volkorn,
+                            fontSize = 14.sp
+                        ),
+                        singleLine = true,
+                        placeholder = {
+                            Text(
+                                text = "Phone No.",
+                                fontFamily = volkorn,
+                                fontSize = 14.sp,
+                            )
+
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(60.dp)
+                            .padding(0.dp, 5.dp)
+                            .clip(RoundedCornerShape(10.dp)),
+                        shape = RoundedCornerShape(6.dp),
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Text,
+                            imeAction = ImeAction.Next
+                        ),
+                        colors = TextFieldDefaults.colors(
+                            focusedTextColor = Color.White,
+                            unfocusedTextColor = Color.Black,
+                            focusedPlaceholderColor = Color.White,
+                            unfocusedPlaceholderColor = Color.Black,
+                            focusedIndicatorColor = Color.Blue,
+                            unfocusedIndicatorColor = Color.Black,
+                            focusedContainerColor = Color(signup.value),
+                            unfocusedContainerColor = Color(signupCard.value)
+                        )
+                    )
+                    TextField(
+                        value = email,
+                        onValueChange = {
+                            email = it
+                        },
+                        textStyle = TextStyle(
+                            fontFamily = volkorn,
+                            fontSize = 14.sp
+                        ),
+                        singleLine = true,
+                        placeholder = {
+                            Text(
+                                text = "Email",
+                                fontFamily = volkorn,
+                                fontSize = 14.sp,
+                            )
+
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(60.dp)
+                            .padding(0.dp, 5.dp)
+                            .clip(RoundedCornerShape(10.dp)),
+                        shape = RoundedCornerShape(6.dp),
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Text,
+                            imeAction = ImeAction.Next
+                        ),
+                        colors = TextFieldDefaults.colors(
+                            focusedTextColor = Color.White,
+                            unfocusedTextColor = Color.Black,
+                            focusedPlaceholderColor = Color.White,
+                            unfocusedPlaceholderColor = Color.Black,
+                            focusedIndicatorColor = Color.Blue,
+                            unfocusedIndicatorColor = Color.Black,
+                            focusedContainerColor = Color(signup.value),
+                            unfocusedContainerColor = Color(signupCard.value)
+                        )
+                    )
+
+                    TextField(
+                        value = password,
+                        onValueChange = {
+                            password = it
+                        },
+                        textStyle = TextStyle(
+                            fontFamily = volkorn,
+                            fontSize = 14.sp
+                        ),
+                        singleLine = true,
+                        placeholder = {
+                            Text(
+                                text = "Password.",
+                                fontFamily = volkorn,
+                                fontSize = 14.sp,
+                            )
+
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(60.dp)
+                            .padding(0.dp, 5.dp)
+                            .clip(RoundedCornerShape(10.dp)),
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Text,
+                            imeAction = ImeAction.Next
+                        ),
+                        visualTransformation = PasswordVisualTransformation(),
+                        colors = TextFieldDefaults.colors(
+                            focusedTextColor = Color.White,
+                            unfocusedTextColor = Color.Black,
+                            focusedPlaceholderColor = Color.White,
+                            unfocusedPlaceholderColor = Color.Black,
+                            focusedIndicatorColor = Color.Blue,
+                            unfocusedIndicatorColor = Color.Black,
+                            focusedContainerColor = Color(signup.value),
+                            unfocusedContainerColor = Color(signupCard.value)
+                        )
+                    )
+
+                    TextField(
+                        value = retypePassword,
+                        onValueChange = {
+                            retypePassword = it
+                        },
+                        textStyle = TextStyle(
+                            fontFamily = volkorn, fontSize = 14.sp
+                        ),
+                        singleLine = true,
+                        placeholder = {
+                            Text(
+                                text = "Retype password",
+                                fontFamily = volkorn,
+                                fontSize = 14.sp,
+                            )
+                        },
+                        visualTransformation = PasswordVisualTransformation(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(60.dp)
+                            .padding(0.dp, 5.dp)
+                            .clip(RoundedCornerShape(10.dp)),
+
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Email,
+                            imeAction = ImeAction.Next
+                        ),
+                        colors = TextFieldDefaults.colors(
+                            focusedTextColor = Color.White,
+                            unfocusedTextColor = Color.Black,
+                            focusedPlaceholderColor = Color.White,
+                            unfocusedPlaceholderColor = Color.Black,
+                            focusedIndicatorColor = Color.Blue,
+                            unfocusedIndicatorColor = Color.Black,
+                            focusedContainerColor = Color(signup.value),
+                            unfocusedContainerColor = Color(signupCard.value)
+                        )
+                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Checkbox(
+                            checked = checkedState,
+                            onCheckedChange = {
+                                checkedState = !checkedState
+                            },
+                            colors = CheckboxDefaults.colors(
+                                checkedColor = Color.Black,
+                                uncheckedColor = Color.White
+                            )
+                        )
+                        Text(
+                            text = "Agree to the terms and condition",
+                            fontFamily = volkorn,
+                            color = Color.White,
+                            fontSize = 14.sp
+                        )
+                    }
+                    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center){
+                        if (authState.value == Status.Loading) {
+                            CircularProgressIndicator(modifier = Modifier.size(20.dp))
+                        }
+                    }
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        OutlinedButton(
+                            onClick = {
+                                // register
+                                if (checkedState && password == retypePassword) {
+                                    authViewmodel.register(
+                                        email = email,
+                                        password = password,
+                                        phone = phone,
+                                        userName = userName
+                                    ) {
+                                        navController.navigate(Routes.Login)
+                                    }
+
+                                } else {
+                                    Toast.makeText(
+                                        context,
+                                        "Password didn't match",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+
+                            },
+                            colors = ButtonDefaults.buttonColors(textFieldColor2),
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Text(
+                                text = "Sign Up", color = Color.Black,
+                                fontSize = 16.sp,
+                                fontFamily = volkorn
+                            )
+                        }
+                    }
                 }
 
             }
+            Spacer(
+                modifier = Modifier
+                    .width(600.dp)
+                    .height(450.dp)
+                    .offset(y = 310.dp)
+                    .scale(2f, 1f)
+                    .clip(RoundedCornerShape(200.dp))
+                    .background(Color(0xFFABCEEC))
+                    .align(Alignment.BottomCenter)
+            )
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(30.dp)
+                    .align(Alignment.BottomCenter),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = "Already have an account?", color = Color.Black,
+                    fontSize = 16.sp,
+                    fontFamily = volkorn
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+                Text(
+                    text = "Login", color = Color.Blue,
+                    fontSize = 24.sp,
+                    fontFamily = volkorn,
+                    modifier = Modifier
+                        .clickable {
+                            navController.navigate(Routes.Login)
+                            authViewmodel.emptyState()
+                        },
+                    textDecoration = TextDecoration.Underline,
+
+                    )
+            }
         }
-
-
     }
 
+
 }
 
-@Preview(showSystemUi = true)
-@Composable
-private fun dcghdddg() {
-    SignUp(rememberNavController(), MainViewModel())
-}

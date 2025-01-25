@@ -1,7 +1,9 @@
 package com.example.medai.user
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -41,7 +44,6 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.medai.R
-import com.example.medai.db.Screens
 import com.example.medai.db.volkorn
 import com.example.medai.ui.theme.ComposablesDesign.Companion.BarTextDesign
 import com.example.medai.ui.theme.ComposablesDesign.Companion.IconsDesign
@@ -49,6 +51,7 @@ import com.example.medai.ui.theme.ComposablesDesign.Companion.TextDesign
 import com.example.medai.ui.theme.drawerColor
 import com.example.medai.ui.theme.textFieldColor
 import com.example.medai.ui.theme.textFieldColor2
+import com.example.medai.util.Routes
 import com.example.medai.viewmodels.MainViewModel
 import kotlinx.coroutines.launch
 
@@ -56,57 +59,56 @@ import kotlinx.coroutines.launch
 @Composable
 fun SearchProducts(navController: NavHostController, mainViewModel: MainViewModel) {
 
+
     var search by remember {
         mutableStateOf("")
     }
     val scope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
-    ModalNavigationDrawer(drawerState = drawerState, gesturesEnabled = true,
-        drawerContent = {
-            ModalDrawerSheet(
+    ModalNavigationDrawer(drawerState = drawerState, gesturesEnabled = true, drawerContent = {
+        ModalDrawerSheet(
+            modifier = Modifier
+                .fillMaxHeight()
+                .width(300.dp)
+                .padding(10.dp, 5.dp),
+            drawerTonalElevation = DrawerDefaults.ModalDrawerElevation,
+            drawerContainerColor = Color(drawerColor.value),
+            drawerShape = RoundedCornerShape(10.dp),
+        ) {
+            Column(
                 modifier = Modifier
-                    .fillMaxHeight()
-                    .width(300.dp)
-                    .padding(10.dp, 5.dp),
-                drawerTonalElevation = DrawerDefaults.ModalDrawerElevation,
-                drawerContainerColor = Color(drawerColor.value),
-                drawerShape = RoundedCornerShape(10.dp),
+                    .fillMaxSize()
+                    .padding(15.dp, 5.dp),
             ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(15.dp, 5.dp),
+                Spacer(modifier = Modifier.height(20.dp))
+                BarTextDesign(name = "Settings") {}
+                BarTextDesign(name = "Personalize") {}
+                BarTextDesign(name = "Security") {}
+                BarTextDesign(name = "Developer options") {}
+                BarTextDesign(name = "Routine checks") {}
+                Row(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.Bottom
                 ) {
-                    Spacer(modifier = Modifier.height(20.dp))
-                    BarTextDesign(name = "Settings") {}
-                    BarTextDesign(name = "Personalize") {}
-                    BarTextDesign(name = "Security") {}
-                    BarTextDesign(name = "Developer options") {}
-                    BarTextDesign(name = "Routine checks") {}
                     Row(
-                        modifier = Modifier.fillMaxSize(),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.Bottom
+                        Modifier.padding(10.dp, 20.dp),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Row(
-                            Modifier.padding(10.dp, 20.dp),
-                            verticalAlignment = Alignment.CenterVertically
+                        IconsDesign(
+                            src = painterResource(id = R.drawable.app_logo), size = 50
                         ) {
-                            IconsDesign(
-                                src = painterResource(id = R.drawable.app_logo),
-                                size = 50
-                            ) {
 
-                            }
-                            TextDesign(name = "MedAi", font = 20)
                         }
-
+                        TextDesign(name = "MedAi", font = 20)
                     }
 
                 }
 
             }
-        }) {
+
+        }
+    }) {
         Scaffold(
             modifier = Modifier
                 .background(Color.White)
@@ -140,22 +142,29 @@ fun SearchProducts(navController: NavHostController, mainViewModel: MainViewMode
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
-                        IconsDesign(
-                            src = painterResource(id = R.drawable.cart)
-                        ) {
-                            navController.navigate(Screens.MainScreen.name)
+                        Image(painter = painterResource(id = R.drawable.cart),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(26.dp)
+                                .clickable {
+                                    navController.navigate(Routes.Cart)
+                                })
+                        Image(painter = painterResource(id = R.drawable.home),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(30.dp)
+                                .clickable {
 
-                        }
-
-                        IconsDesign(src = painterResource(id = R.drawable.home)) {
-                            navController.navigate(Screens.MainScreen.name)
-
-                        }
-                        IconsDesign(src = painterResource(id = R.drawable.menus)) {
-                            scope.launch {
-                                drawerState.open()
-                            }
-                        }
+                                })
+                        Image(painter = painterResource(id = R.drawable.menu),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(30.dp)
+                                .clickable {
+                                    scope.launch {
+                                        drawerState.open()
+                                    }
+                                })
                     }
                 }
                 // show contents

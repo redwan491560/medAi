@@ -20,5 +20,7 @@ val textFieldColor = Color(0xFFF4F5FA)
 val textFieldColor2 = Color(0xFFF5F5DC)
 
 
-val signup = Color(0xFF3C6F82)
-val login = Color(0xFF66F1E1)
+val signup = Color(0xFF3D758A)
+val signupCard = Color(0xFFC8DEF1)
+val login = Color(0xFFC4E6BC)
+val loginCard = Color(0xFFEEEED8)

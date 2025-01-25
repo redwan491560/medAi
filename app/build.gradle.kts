@@ -1,8 +1,9 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
-    id("io.realm.kotlin")
-
+    kotlin("plugin.serialization") version "2.0.20"
+    alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.google.gms.google.services)
 }
 
 android {
@@ -61,6 +62,10 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+
+    implementation(libs.androidx.runtime.livedata)
+    implementation(libs.firebase.database.ktx)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -69,18 +74,27 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
+
+    // If using coroutines with the SDK
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.0")
+    // serialization
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
+
     // navigation
     implementation(libs.androidx.navigation.compose)
 
 
-    // realm plugins
-    implementation("io.realm.kotlin:library-base:1.16.0")
-    // If using Device Sync
-    implementation("io.realm.kotlin:library-sync:1.16.0")
-    // If using coroutines with the SDK
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.0")
-    // serialization
-   // implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.1")
+    // coil
+    implementation("io.coil-kt.coil3:coil-compose:3.0.0-rc01")
+    implementation("io.coil-kt.coil3:coil-network-okhttp:3.0.0-rc01")
 
+    // gemini
+    implementation("com.google.ai.client.generativeai:generativeai:0.9.0")
+
+    // firebase
+    // Import the BoM for the Firebase platform
+    implementation(platform("com.google.firebase:firebase-bom:33.6.0"))
+    implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-firestore")
 
 }

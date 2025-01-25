@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "314917347910",
+    "project_id": "medaibyredwan60",
+    "storage_bucket": "medaibyredwan60.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:314917347910:android:d8e2d1c36a1a854ce46047",
+        "android_client_info": {
+          "package_name": "com.example.medai"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB3qC0ZJ12CAuxXWTlmKyZ5L9dyzWejg6w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
